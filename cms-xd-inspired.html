@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS Blog Soumaya</title>
+  <style>
+    :root {
+      --bg: #f7f4f2;
+      --panel: rgba(255, 255, 255, 0.94);
+      --white: #ffffff;
+      --navy: #123f95;
+      --navy-deep: #0a2d73;
+      --cyan: #06a7ef;
+      --cyan-soft: #d8f2ff;
+      --rose: #ddb1bf;
+      --rose-soft: #f4dbe2;
+      --lime: #ccdc00;
+      --text: #171717;
+      --muted: #5f6472;
+      --line: rgba(18, 63, 149, 0.12);
+      --shadow: 0 24px 60px rgba(15, 30, 71, 0.16);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(221, 177, 191, 0.95) 0, rgba(221, 177, 191, 0.95) 14rem, transparent 14rem),
+        radial-gradient(circle at bottom left, rgba(6, 167, 239, 0.08) 0, rgba(6, 167, 239, 0.08) 10rem, transparent 10rem),
+        linear-gradient(180deg, #fcfbfa 0%, var(--bg) 100%);
+      overflow: hidden;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 0;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.16), transparent 35%),
+        linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+      color: #fff;
+      border-right: 0;
+      box-shadow: 18px 0 40px rgba(10, 45, 115, 0.14);
+      overflow: hidden;
+    }
+
+    .sidebar::before,
+    .sidebar::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .sidebar::before {
+      width: 240px;
+      height: 240px;
+      right: -110px;
+      top: -60px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .sidebar::after {
+      width: 220px;
+      height: 220px;
+      left: -120px;
+      bottom: 48px;
+      background: rgba(221, 177, 191, 0.18);
+    }
+
+    .brand,
+    .menu {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand {
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 22px 22px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-copy strong,
+    .brand-copy span {
+      display: block;
+    }
+
+    .brand-copy strong {
+      font-size: 1.1rem;
+      letter-spacing: 0;
+      color: #fff;
+    }
+
+    .brand-copy span {
+      display: none;
+    }
+
+    .sidebar-top,
+    .sidebar-bottom {
+      position: relative;
+      z-index: 1;
+    }
+
+    .menu {
+      display: grid;
+      gap: 0;
+      margin-top: 0;
+      padding: 20px 0 0;
+    }
+
+    .sidebar-nav {
+      display: grid;
+      gap: 0;
+    }
+
+    .sidebar-section-label {
+      margin: 0;
+      padding: 0 22px 14px;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-item {
+      display: grid;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0;
+      width: 100%;
+      padding: 15px 22px;
+      border: 0;
+      border-left: 3px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.92);
+      cursor: pointer;
+      text-align: left;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .sidebar-link span,
+    .sidebar-link strong {
+      display: block;
+    }
+
+    .sidebar-link > span > span {
+      display: none;
+    }
+
+    .sidebar-link strong {
+      font-size: 0.96rem;
+      font-weight: 600;
+    }
+
+    .sidebar-link-badge {
+      display: none;
+    }
+
+    .sidebar-link:hover,
+    .sidebar-link:focus-visible {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      outline: none;
+    }
+
+    .sidebar-link.is-active {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-left-color: #fff;
+    }
+
+    .sidebar-subaction {
+      display: none;
+      margin: 0;
+      padding: 12px 22px 12px 42px;
+      border: 0;
+      background: transparent;
+      color: #9dbdff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .sidebar-item.is-expanded .sidebar-subaction {
+      display: block;
+    }
+
+    .sidebar-subaction:hover,
+    .sidebar-subaction:focus-visible {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      outline: none;
+    }
+
+    .primary-action,
+    .site-tab,
+    .article-row,
+    .sidebar-link,
+    .ghost-btn,
+    .solid-btn,
+    .secondary-btn,
+    .article-nav-btn,
+    .back-link {
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .primary-action:hover,
+    .primary-action:focus-visible,
+    .site-tab:hover,
+    .site-tab:focus-visible,
+    .article-row:hover,
+    .article-row:focus-visible,
+    .ghost-btn:hover,
+    .ghost-btn:focus-visible,
+    .solid-btn:hover,
+    .solid-btn:focus-visible,
+    .secondary-btn:hover,
+    .secondary-btn:focus-visible,
+    .article-nav-btn:hover,
+    .article-nav-btn:focus-visible,
+    .back-link:hover,
+    .back-link:focus-visible {
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .content {
+      position: relative;
+      padding: 28px;
+      display: block;
+      min-width: 0;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .content::before {
+      content: "";
+      position: absolute;
+      top: 28px;
+      right: 42px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(221, 177, 191, 0.38);
+      filter: blur(10px);
+      z-index: 0;
+    }
+
+    .canvas {
+      position: relative;
+      z-index: 1;
+    }
+
+    .canvas {
+      min-height: calc(100vh - 56px);
+      border-radius: 36px;
+      border: 1px solid rgba(18, 63, 149, 0.08);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.9)),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(18, 63, 149, 0.03) 39px, rgba(18, 63, 149, 0.03) 40px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 28px;
+      min-width: 0;
+    }
+
+    .preview-shell {
+      min-height: 100%;
+      min-width: 0;
+    }
+
+    .browser-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .browser-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(18, 63, 149, 0.18);
+    }
+
+    .browser-dots span:nth-child(1) {
+      background: #ff9e9e;
+    }
+
+    .browser-dots span:nth-child(2) {
+      background: #ffd86d;
+    }
+
+    .browser-dots span:nth-child(3) {
+      background: #90d984;
+    }
+
+    .site-frame {
+      background: var(--white);
+      border-radius: 34px;
+      border: 1px solid rgba(18, 63, 149, 0.08);
+      overflow: hidden;
+      min-width: 0;
+      box-shadow: 0 18px 38px rgba(18, 63, 149, 0.08);
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px 26px;
+      border-bottom: 1px solid rgba(18, 63, 149, 0.08);
+      background: rgba(255, 255, 255, 0.96);
+      min-width: 0;
+    }
+
+    .site-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .site-brand-mark {
+      width: 50px;
+      height: 50px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, var(--navy) 0%, var(--cyan) 100%);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .site-brand strong,
+    .site-brand span {
+      display: block;
+    }
+
+    .site-brand span {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .site-tab {
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(18, 63, 149, 0.1);
+      background: transparent;
+      color: var(--navy);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .site-tab.is-active {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--cyan) 100%);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(18, 63, 149, 0.15);
+    }
+
+    .site-tab:hover,
+    .site-tab:focus-visible {
+      border-color: rgba(6, 167, 239, 0.26);
+      box-shadow: 0 14px 26px rgba(18, 63, 149, 0.1);
+    }
+
+    .site-screen {
+      display: none;
+      padding: 0;
+    }
+
+    .site-screen.is-active {
+      display: block;
+    }
+
+    .home-hero {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 24px;
+      padding: 30px;
+      border-bottom: 1px solid rgba(18, 63, 149, 0.08);
+    }
+
+    .home-copy {
+      padding: 34px;
+      border-radius: 28px;
+      border: 1px solid rgba(18, 63, 149, 0.08);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.84));
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--cyan-soft);
+      color: var(--navy);
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .home-copy h3,
+    .blog-shell h3,
+    .article-shell h3 {
+      margin: 0;
+      font-size: clamp(1.8rem, 2.5vw, 2.8rem);
+      line-height: 1.02;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .home-copy p,
+    .blog-shell p,
+    .article-shell p,
+    .home-card p,
+    .article-row p,
+    .article-meta,
+    .article-content p,
+    .footer-card p,
+    .footer-links a,
+    .footer-links li {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .home-copy p {
+      margin: 18px 0 22px;
+      max-width: 50ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .solid-btn,
+    .secondary-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 18px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .solid-btn {
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--navy) 100%);
+      color: #fff;
+      box-shadow: 0 16px 30px rgba(18, 63, 149, 0.18);
+    }
+
+    .secondary-btn {
+      background: rgba(221, 177, 191, 0.18);
+      color: var(--navy);
+    }
+
+    .solid-btn:hover,
+    .solid-btn:focus-visible {
+      box-shadow: 0 22px 36px rgba(18, 63, 149, 0.22);
+    }
+
+    .secondary-btn:hover,
+    .secondary-btn:focus-visible,
+    .ghost-btn:hover,
+    .ghost-btn:focus-visible,
+    .back-link:hover,
+    .back-link:focus-visible {
+      background: rgba(221, 177, 191, 0.28);
+      box-shadow: 0 16px 28px rgba(18, 63, 149, 0.08);
+    }
+
+    .home-visual {
+      min-height: 340px;
+      border-radius: 32px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(221, 177, 191, 0.94) 0, rgba(221, 177, 191, 0.94) 40%, transparent 40%),
+        linear-gradient(180deg, #fbf7f8 0%, #f8f2f4 100%);
+    }
+
+    .home-visual::before {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      right: 26px;
+      bottom: 24px;
+      border-radius: 34px;
+      background: linear-gradient(180deg, rgba(18, 63, 149, 0.96), rgba(10, 45, 115, 0.94));
+      transform: rotate(12deg);
+      box-shadow: 0 20px 40px rgba(18, 63, 149, 0.2);
+    }
+
+    .home-visual::after {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      left: 30px;
+      bottom: 26px;
+      border-radius: 50%;
+      background: rgba(6, 167, 239, 0.16);
+    }
+
+    .floating-card {
+      position: absolute;
+      left: 34px;
+      top: 34px;
+      width: min(260px, calc(100% - 68px));
+      padding: 20px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(18, 63, 149, 0.08);
+      box-shadow: 0 18px 36px rgba(18, 63, 149, 0.12);
+    }
+
+    .floating-card strong,
+    .home-card strong,
+    .article-row h4,
+    .article-shell h3,
+    .footer-card strong {
+      color: var(--navy);
+    }
+
+    .floating-lines {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .floating-lines span {
+      height: 11px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(18, 63, 149, 0.1), rgba(6, 167, 239, 0.22));
+    }
+
+    .floating-lines span:nth-child(2) {
+      width: 84%;
+    }
+
+    .floating-lines span:nth-child(3) {
+      width: 62%;
+    }
+
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      padding: 0 30px 30px;
+    }
+
+    .home-card {
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid rgba(18, 63, 149, 0.08);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 14px 34px rgba(18, 63, 149, 0.08);
+    }
+
+    .home-card span {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(6, 167, 239, 0.1);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .blog-shell,
+    .article-shell {
+      padding: 30px;
+    }
+
+    .blog-title {
+      margin-bottom: 22px;
+    }
+
+    .blog-title p,
+    .article-intro {
+      margin: 14px 0 0;
+      max-width: 62ch;
+    }
+
+    .article-list {
+      display: grid;
+      gap: 20px;
+    }
+
+    .article-row {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 20px;
+      width: 100%;
+      padding: 18px;
+      border: 1px solid rgba(18, 63, 149, 0.08);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 14px 34px rgba(18, 63, 149, 0.08);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .article-row:hover,
+    .article-row:focus-visible {
+      box-shadow: 0 20px 40px rgba(18, 63, 149, 0.14);
+    }
+
+    .article-thumb {
+      min-height: 185px;
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(18, 63, 149, 0.94), rgba(6, 167, 239, 0.78)),
+        linear-gradient(180deg, rgba(221, 177, 191, 0.3), rgba(221, 177, 191, 0.3));
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .article-thumb::before {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      right: -24px;
+      top: -28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .article-thumb::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      left: 16px;
+      bottom: -22px;
+      border-radius: 26px;
+      background: rgba(221, 177, 191, 0.4);
+      transform: rotate(18deg);
+    }
+
+    .article-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .article-topline,
+    .article-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .meta-pill,
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(6, 167, 239, 0.1);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .article-row h4 {
+      margin: 12px 0 10px;
+      font-size: 1.38rem;
+      line-height: 1.2;
+    }
+
+    .article-row p {
+      margin: 0 0 16px;
+    }
+
+    .read-link {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .blog-pagination {
+      margin-top: 26px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      color: var(--muted);
+    }
+
+    .article-shell {
+      display: none;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    .article-shell.is-active {
+      display: grid;
+    }
+
+    .back-link {
+      justify-self: start;
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      background: rgba(18, 63, 149, 0.08);
+      color: var(--navy);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .article-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .danger-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      background: rgba(198, 47, 62, 0.1);
+      color: #b4232f;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 160ms ease, background 160ms ease;
+    }
+
+    .danger-btn:hover,
+    .danger-btn:focus-visible {
+      transform: translateY(-2px);
+      background: rgba(198, 47, 62, 0.16);
+      outline: none;
+    }
+
+    .article-banner {
+      min-height: 300px;
+      width: 100%;
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(18, 63, 149, 0.94), rgba(6, 167, 239, 0.78)),
+        linear-gradient(180deg, rgba(221, 177, 191, 0.3), rgba(221, 177, 191, 0.3));
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .article-banner::before {
+      content: "";
+      position: absolute;
+      right: -30px;
+      top: -42px;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .article-banner::after {
+      content: "";
+      position: absolute;
+      left: 22px;
+      bottom: -24px;
+      width: 180px;
+      height: 180px;
+      border-radius: 34px;
+      background: rgba(221, 177, 191, 0.32);
+      transform: rotate(16deg);
+    }
+
+    .article-content {
+      display: grid;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .article-content strong {
+      color: var(--navy);
+    }
+
+    .article-content a {
+      color: var(--cyan);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .article-content h2,
+    .article-content h3,
+    .article-content h4 {
+      margin: 8px 0 12px;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+
+    .article-content h4 {
+      margin: 10px 0 0;
+      font-size: 1.18rem;
+      color: var(--navy);
+    }
+
+    .article-content p {
+      margin: 0;
+    }
+
+    .article-content ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .article-navigation {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .article-nav-btn {
+      text-align: left;
+      border: 1px solid rgba(18, 63, 149, 0.08);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.92);
+      padding: 18px;
+      cursor: pointer;
+      box-shadow: 0 14px 34px rgba(18, 63, 149, 0.08);
+      min-width: 0;
+    }
+
+    .article-nav-btn span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .article-nav-btn strong {
+      color: var(--navy);
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .tags-block {
+      padding: 22px 24px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(18, 63, 149, 0.08);
+      box-shadow: 0 14px 34px rgba(18, 63, 149, 0.08);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .site-footer {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      padding: 26px 30px 30px;
+      background: linear-gradient(180deg, #fbfbfb 0%, #f6f7fb 100%);
+      border-top: 1px solid rgba(18, 63, 149, 0.08);
+    }
+
+    .footer-card {
+      padding: 24px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(18, 63, 149, 0.08);
+      box-shadow: 0 14px 34px rgba(18, 63, 149, 0.08);
+    }
+
+    .footer-profile {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .profile-photo {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 38% 35%, #f6d6de 0, #f6d6de 30%, #d8a9b8 30%, #d8a9b8 100%);
+      position: relative;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+
+    .profile-photo::before {
+      content: "";
+      position: absolute;
+      left: 21px;
+      top: 17px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #20273d;
+    }
+
+    .profile-photo::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      bottom: 10px;
+      width: 52px;
+      height: 30px;
+      border-radius: 30px 30px 16px 16px;
+      background: #20273d;
+    }
+
+    .footer-profile h4 {
+      margin: 0 0 6px;
+      color: var(--navy);
+      font-size: 1.2rem;
+    }
+
+    .footer-profile strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--navy);
+    }
+
+    .copyright {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .partner-logos {
+      display: flex;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .partner-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(6, 167, 239, 0.08);
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      margin-top: 18px;
+      padding-left: 18px;
+    }
+
+    .footer-links li {
+      margin-bottom: 8px;
+    }
+
+    .footer-links a {
+      text-decoration: none;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      padding: 24px;
+      background: rgba(9, 18, 42, 0.48);
+      backdrop-filter: blur(18px);
+      z-index: 40;
+      overflow: auto;
+    }
+
+    .modal-backdrop.is-open {
+      display: block;
+    }
+
+    .modal {
+      width: min(1280px, calc(100vw - 48px));
+      height: min(880px, calc(100vh - 48px));
+      margin: 0 auto;
+      border-radius: 36px;
+      background:
+        radial-gradient(circle at top right, rgba(221, 177, 191, 0.56), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.94));
+      box-shadow: 0 32px 70px rgba(7, 20, 56, 0.28);
+      overflow: hidden;
+      border: 1px solid rgba(18, 63, 149, 0.1);
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    #blogForm {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding: 26px 28px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 1px solid rgba(18, 63, 149, 0.08);
+    }
+
+    .modal-header h3 {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+    }
+
+    .modal-header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 52ch;
+    }
+
+    .close-btn {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 14px;
+      background: rgba(18, 63, 149, 0.08);
+      color: var(--navy);
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus-visible {
+      transform: translateY(-1px);
+      background: rgba(18, 63, 149, 0.14);
+      color: var(--navy-deep);
+      outline: none;
+    }
+
+    .modal-body {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 20px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .field,
+    .field-wide {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    .editor-panel .field-wide {
+      min-height: 0;
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+
+    .field label,
+    .field-wide label {
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .field input,
+    .field-wide input,
+    .field-wide textarea {
+      width: 100%;
+      border: 1px solid rgba(18, 63, 149, 0.14);
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--text);
+      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .field input:focus,
+    .field-wide input:focus,
+    .field-wide textarea:focus {
+      outline: none;
+      border-color: rgba(6, 167, 239, 0.42);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 0 0 4px rgba(6, 167, 239, 0.12);
+    }
+
+    .field-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .editor-wrap {
+      border: 1px solid rgba(18, 63, 149, 0.14);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.9);
+      overflow: hidden;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      height: 100%;
+      max-height: 100%;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(18, 63, 149, 0.1);
+      background: rgba(248, 251, 255, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding-right: 12px;
+      border-right: 1px solid rgba(18, 63, 149, 0.08);
+    }
+
+    .toolbar-group:last-child {
+      border-right: 0;
+      padding-right: 0;
+    }
+
+    .toolbar-btn,
+    .size-btn {
+      border: 1px solid rgba(18, 63, 149, 0.14);
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--navy);
+      border-radius: 14px;
+      min-height: 40px;
+    }
+
+    .toolbar-btn,
+    .size-btn {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .toolbar-btn:hover,
+    .toolbar-btn.is-active,
+    .size-btn:hover,
+    .size-btn.is-active {
+      background: linear-gradient(180deg, rgba(6, 167, 239, 0.12), rgba(6, 167, 239, 0.18));
+      border-color: rgba(6, 167, 239, 0.24);
+    }
+
+    .editor-surface {
+      min-height: 0;
+      height: 100%;
+      max-height: 100%;
+      padding: 24px 22px 36px;
+      outline: none;
+      line-height: 1.7;
+      color: var(--text);
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-gutter: stable;
+    }
+
+    .editor-surface:empty::before {
+      content: attr(data-placeholder);
+      color: #8a92a5;
+    }
+
+    .editor-surface p,
+    .editor-surface ul,
+    .editor-surface ol,
+    .article-content p,
+    .article-content ul,
+    .article-content ol {
+      margin: 0 0 14px;
+    }
+
+    .editor-surface ul,
+    .editor-surface ol,
+    .article-content ul,
+    .article-content ol {
+      padding-left: 22px;
+    }
+
+    .editor-surface .size-small,
+    .article-content .size-small {
+      font-size: 0.92rem;
+    }
+
+    .editor-surface .size-normal,
+    .article-content .size-normal {
+      font-size: 1rem;
+    }
+
+    .editor-surface .size-large,
+    .article-content .size-large {
+      font-size: 1.18rem;
+    }
+
+    .editor-surface .size-xlarge,
+    .article-content .size-xlarge {
+      font-size: 1.42rem;
+      line-height: 1.45;
+    }
+
+    .editor-panel {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: 1fr;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .meta-panel {
+      min-height: 0;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-top: 1px solid rgba(18, 63, 149, 0.08);
+    }
+
+    .ghost-btn,
+    .solid-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .ghost-btn {
+      background: rgba(18, 63, 149, 0.08);
+      color: var(--navy);
+    }
+
+    .save-message {
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 1180px) {
+      .home-hero,
+      .site-footer {
+        grid-template-columns: 1fr;
+      }
+
+      .home-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .article-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        gap: 22px;
+      }
+
+      .content {
+        padding: 24px;
+      }
+
+      .site-header,
+      .modal-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .modal {
+        width: calc(100vw - 24px);
+        height: calc(100vh - 24px);
+      }
+
+      .modal-body {
+        grid-template-columns: 1fr;
+        overflow: auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .article-navigation {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .sidebar,
+      .content,
+      .canvas,
+      .home-hero,
+      .blog-shell,
+      .article-shell,
+      .site-footer,
+      .home-grid {
+        padding: 20px;
+      }
+
+      .home-copy,
+      .home-card,
+      .footer-card,
+      .article-row,
+      .modal-header,
+      .modal-body,
+      .modal-footer {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <div class="brand-copy">
+            <strong>CMS Soumaya</strong>
+          </div>
+        </div>
+
+        <div class="menu">
+          <div class="sidebar-nav" aria-label="Navigation CMS">
+            <p class="sidebar-section-label">Pages</p>
+            <div class="sidebar-item">
+              <button class="sidebar-link is-active" type="button" data-screen-nav="home">
+                <span>
+                  <strong>Accueil</strong>
+                  <span>Vitrine et hero principal</span>
+                </span>
+              </button>
+            </div>
+            <div class="sidebar-item" id="blogSidebarItem">
+              <button class="sidebar-link" type="button" data-screen-nav="blog">
+                <span>
+                  <strong>Blog intranet</strong>
+                  <span>Articles, listing et lecture</span>
+                </span>
+              </button>
+              <button class="sidebar-subaction" id="openModalBtn" type="button">+ Ajouter un blog</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="canvas">
+        <div class="preview-shell">
+          <div class="site-frame">
+            <div class="site-header">
+              <div class="site-brand">
+                <div class="site-brand-mark">ST</div>
+                <div>
+                  <strong>Soumaya Toumi</strong>
+                  <span>Communication interne et intranet</span>
+                </div>
+              </div>
+
+              <div class="site-nav">
+                <button class="site-tab is-active" type="button" data-screen="home">Accueil</button>
+                <button class="site-tab" type="button" data-screen="blog">Blog intranet</button>
+              </div>
+            </div>
+
+            <div class="site-screen is-active" id="screen-home">
+              <div class="home-hero">
+                <div class="home-copy">
+                  <span class="eyebrow">Communication interne</span>
+                  <h3>Facilite ta communication interne avec un site plus clair et plus vivant</h3>
+                  <p>Cette page d’accueil sert de vitrine dans le CMS. Elle reste cohérente avec la direction artistique du site d’origine, puis elle renvoie naturellement vers la partie blog pour les contenus éditoriaux.</p>
+                  <div class="hero-actions">
+                    <button class="solid-btn" type="button">Prendre rendez-vous</button>
+                    <button class="secondary-btn" id="openBlogFromHome" type="button">Consulter le blog</button>
+                  </div>
+                </div>
+
+                <div class="home-visual" aria-hidden="true">
+                  <div class="floating-card">
+                    <strong>Articles et ressources</strong>
+                    <div class="floating-lines">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="home-grid">
+                <div class="home-card">
+                  <span>Clarté</span>
+                  <strong>Une base éditoriale commune</strong>
+                  <p>Chaque contenu renvoie vers une même structure lisible, avec une hiérarchie simple et des entrées rassurantes pour le lecteur.</p>
+                </div>
+                <div class="home-card">
+                  <span>Rythme</span>
+                  <strong>Un blog qui reste vivant</strong>
+                  <p>Les articles donnent du relief au site et permettent de partager des retours d’expérience, des conseils et des points de vue terrain.</p>
+                </div>
+                <div class="home-card">
+                  <span>CMS</span>
+                  <strong>Création guidée des blogs</strong>
+                  <p>Le bouton d’ajout crée directement un article avec le même gabarit que les autres, pour garder une cohérence immédiate.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="site-screen" id="screen-blog">
+              <div class="blog-shell" id="blogListing">
+                <div class="blog-title">
+                  <span class="eyebrow">Blog intranet</span>
+                  <h3>Les articles récents</h3>
+                  <p>Le listing reprend une logique proche du site de Soumaya: un titre clair, des visuels horizontaux, un extrait et une invitation à poursuivre la lecture.</p>
+                </div>
+
+                <div class="article-list" id="articleList"></div>
+
+                <div class="blog-pagination">
+                  <strong>Pagination des publications</strong>
+                  <span>Page 1</span>
+                  <span>Page 2</span>
+                  <span>Publications plus anciennes</span>
+                </div>
+              </div>
+
+              <div class="article-shell" id="articleView">
+                <div class="article-actions">
+                  <button class="back-link" id="backToBlogBtn" type="button">Retour au blog</button>
+                  <button class="danger-btn" id="deleteBlogBtn" type="button">Supprimer ce blog</button>
+                </div>
+                <span class="eyebrow" id="articleCategory">Culture interne</span>
+                <h3 id="articleTitle">Titre article</h3>
+                <p class="article-intro" id="articleIntro">Introduction article</p>
+                <div class="article-meta">
+                  <span id="articleDate">25 juin 2026</span>
+                  <span id="articleViews">209 vues</span>
+                </div>
+                <div class="article-banner" id="articleBanner"></div>
+                <div class="article-content" id="articleContent"></div>
+                <div class="article-navigation">
+                  <button class="article-nav-btn" id="prevArticleBtn" type="button">
+                    <span>Publication précédente</span>
+                    <strong id="prevArticleTitle">Article précédent</strong>
+                  </button>
+                  <button class="article-nav-btn" id="nextArticleBtn" type="button">
+                    <span>Publication suivante</span>
+                    <strong id="nextArticleTitle">Article suivant</strong>
+                  </button>
+                </div>
+              </div>
+
+              <div class="blog-shell">
+                <div class="tags-block" id="tagsBlock"></div>
+              </div>
+
+              <div class="site-footer">
+                <div class="footer-card">
+                  <div class="footer-profile">
+                    <div class="profile-photo" aria-hidden="true"></div>
+                    <div>
+                      <h4>Soumaya Toumi</h4>
+                      <strong>+ 13 ans d’expérience</strong>
+                      <p>J’aide les responsables de communication à construire leur propre plateforme d’échanges internes en une semaine.</p>
+                      <span class="copyright">© SHAREONLINE 2024</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="footer-card">
+                  <strong>Partenaires officiels</strong>
+                  <div class="partner-logos">
+                    <span class="partner-pill">Powell</span>
+                    <span class="partner-pill">Jint</span>
+                  </div>
+                  <ul class="footer-links">
+                    <li>Informations légales</li>
+                    <li><a href="#" tabindex="-1">Mentions légales</a></li>
+                    <li><a href="#" tabindex="-1">Politique de cookies</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalTitle">Ajouter un blog</h3>
+          <p>Renseigne ici le contenu de base de ton futur article. Une fois soumis, le CMS génère automatiquement le nouvel article avec le même format visuel que les autres pages blog.</p>
+        </div>
+        <button class="close-btn" id="closeModalBtn" type="button" aria-label="Fermer la fenêtre">×</button>
+      </div>
+
+      <form id="blogForm">
+        <div class="modal-body">
+          <div class="meta-panel">
+            <div class="form-grid">
+              <div class="field">
+                <label for="blogTitle">Titre du blog</label>
+                <input id="blogTitle" name="blogTitle" type="text" placeholder="Exemple : 5 clés pour structurer ton intranet" required />
+              </div>
+
+              <div class="field">
+                <label for="blogCategory">Catégorie</label>
+                <input id="blogCategory" name="blogCategory" type="text" placeholder="Exemple : Stratégie intranet" required />
+              </div>
+
+              <div class="field">
+                <label for="blogImage">Image de couverture</label>
+                <input id="blogImage" name="blogImage" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+                <p class="field-note">Formats acceptés : JPEG, JPG et PNG uniquement.</p>
+              </div>
+
+              <div class="field-wide">
+                <label for="blogExcerpt">Extrait</label>
+                <input id="blogExcerpt" name="blogExcerpt" type="text" placeholder="Le résumé affiché dans la liste des blogs." required />
+              </div>
+            </div>
+
+          </div>
+
+          <div class="editor-panel">
+            <div class="field-wide">
+              <label for="blogContent">Contenu du blog</label>
+              <div class="editor-wrap">
+                <div class="editor-toolbar" aria-label="Outils de mise en forme">
+                  <div class="toolbar-group">
+                    <button class="toolbar-btn" type="button" data-command="bold"><strong>B</strong></button>
+                    <button class="toolbar-btn" type="button" data-command="italic"><em>I</em></button>
+                    <button class="toolbar-btn" type="button" id="linkBtn">Lien</button>
+                  </div>
+                  <div class="toolbar-group">
+                    <button class="toolbar-btn" type="button" data-block="h2">Titre</button>
+                    <button class="toolbar-btn" type="button" data-block="h3">Intertitre</button>
+                    <button class="toolbar-btn" type="button" data-block="p">Paragraphe</button>
+                  </div>
+                  <div class="toolbar-group">
+                    <button class="toolbar-btn" type="button" data-command="insertUnorderedList">• Liste</button>
+                    <button class="toolbar-btn" type="button" data-command="insertOrderedList">1. Liste</button>
+                  </div>
+                  <div class="toolbar-group">
+                    <button class="toolbar-btn" type="button" data-command="justifyLeft">Gauche</button>
+                    <button class="toolbar-btn" type="button" data-command="justifyCenter">Centre</button>
+                    <button class="toolbar-btn" type="button" data-command="justifyRight">Droite</button>
+                    <button class="toolbar-btn" type="button" data-command="justifyFull">Justifié</button>
+                  </div>
+                  <div class="toolbar-group">
+                    <button class="size-btn" type="button" data-size="size-small">T-</button>
+                    <button class="size-btn is-active" type="button" data-size="size-normal">T</button>
+                    <button class="size-btn" type="button" data-size="size-large">T+</button>
+                    <button class="size-btn" type="button" data-size="size-xlarge">T++</button>
+                  </div>
+                </div>
+                <div
+                  class="editor-surface"
+                  id="blogContentEditor"
+                  contenteditable="true"
+                  data-placeholder="Écris ici le contenu du blog puis mets-le en forme."
+                ></div>
+              </div>
+              <input id="blogContent" name="blogContent" type="hidden" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="ghost-btn" id="cancelModalBtn" type="button">Annuler</button>
+          <div class="save-message" id="saveMessage">Le format sera généré automatiquement.</div>
+          <button class="solid-btn" type="submit">Créer le blog</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const articleTags = [
+      "#communication",
+      "#communicationinterne",
+      "#communicationsite",
+      "#communicationportal",
+      "#digital",
+      "#digitalworkplace",
+      "#espacecommunication",
+      "#espacedetravailmoderne",
+      "#intranet",
+      "#internalcommunication",
+      "#microsoft365",
+      "#modernworkplace"
+    ];
+
+    const articles = [
+      {
+        title: "5 facteurs clés de succès d’un projet intranet : retour d’expérience d’un intranet réussi en PME",
+        category: "Retour d’expérience",
+        date: "29 avril 2026",
+        views: 209,
+        excerpt: "Pourquoi certains projets intranet fonctionnent durablement quand d’autres peinent à décoller ? Voici cinq leviers très concrets observés sur le terrain.",
+        image: "",
+        body: [
+          "Un projet intranet tient rarement seulement à l’outil. Ce qui fait la différence, c’est la combinaison entre le bon moment, la bonne gouvernance et une communication éditoriale qui reste simple pour les équipes.",
+          "Premier facteur : le timing. Quand un intranet arrive au moment où les équipes ont besoin de se recentrer, l’adoption est plus naturelle car le problème est déjà ressenti sur le terrain.",
+          "Deuxième facteur : la formation des contributeurs. Un site interne ne vit pas seulement grâce à sa structure, mais grâce aux personnes qui savent l’alimenter sans friction.",
+          "Troisième facteur : la lisibilité mobile. Lorsque les collaborateurs sont répartis, souvent en déplacement ou en site décentralisé, l’accès rapide devient une condition de base.",
+          "Les deux derniers facteurs sont la transparence dans l’information et une vraie stratégie de communication interne. Sans cela, le site reste un support passif au lieu d’un point d’appui quotidien."
+        ]
+      },
+      {
+        title: "Structurer la communication interne dans un réseau d’entreprises : pourquoi l’outil intranet n’est pas le point de départ",
+        category: "Structuration",
+        date: "9 mars 2026",
+        views: 310,
+        excerpt: "Dans les organisations multi-sites, la vraie première étape n’est pas le choix de l’outil mais la clarification des objectifs, des usages et du projet collectif.",
+        image: "",
+        body: [
+          "Quand une organisation fonctionne en réseau, la tentation est forte de commencer par comparer des plateformes. Pourtant, ce n’est pas la meilleure première question.",
+          "Avant l’outil, il faut clarifier ce que les équipes doivent trouver, publier et comprendre. Sans ce cadrage, même un très bon intranet devient vite une couche supplémentaire.",
+          "Une structure éditoriale minimale aide souvent davantage qu’une usine à gaz : des rubriques mémorables, des rôles clairs et des formats de contenus facilement reproductibles.",
+          "L’outil vient ensuite soutenir un projet déjà lisible, au lieu d’essayer de lui donner du sens après coup."
+        ]
+      },
+      {
+        title: "Comment un intranet SharePoint a contribué à créer une culture de groupe après la fusion de trois coopératives forestières",
+        category: "Culture de groupe",
+        date: "14 février 2026",
+        views: 184,
+        excerpt: "Après une fusion, l’intranet peut devenir un point d’ancrage commun s’il relie vraiment les équipes, les usages et les repères partagés.",
+        image: "",
+        body: [
+          "Après une fusion, les contenus ne suffisent pas : il faut recréer des repères communs. Un intranet utile joue alors un rôle de traduction entre les habitudes, les métiers et les nouvelles priorités collectives.",
+          "SharePoint a ici servi de socle, mais la vraie réussite venait d’un travail de mise en récit : donner de la visibilité aux projets, valoriser les agences et installer de nouveaux rituels d’information.",
+          "Le site est devenu un lieu de convergence parce qu’il répondait à des besoins quotidiens, pas parce qu’il était simplement bien présenté.",
+          "C’est cette articulation entre information, appartenance et simplicité d’accès qui transforme un intranet en outil fédérateur."
+        ]
+      }
+    ];
+
+    let currentArticleIndex = null;
+
+    const openModalBtn = document.getElementById("openModalBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const cancelModalBtn = document.getElementById("cancelModalBtn");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const blogForm = document.getElementById("blogForm");
+    const saveMessage = document.getElementById("saveMessage");
+    const openBlogFromHome = document.getElementById("openBlogFromHome");
+    const blogContentInput = document.getElementById("blogContent");
+    const blogContentEditor = document.getElementById("blogContentEditor");
+    const blogImageInput = document.getElementById("blogImage");
+    const linkBtn = document.getElementById("linkBtn");
+    const toolbarButtons = Array.from(document.querySelectorAll(".toolbar-btn[data-command]"));
+    const blockButtons = Array.from(document.querySelectorAll(".toolbar-btn[data-block]"));
+    const sizeButtons = Array.from(document.querySelectorAll(".size-btn[data-size]"));
+    const tabs = Array.from(document.querySelectorAll(".site-tab"));
+    const sidebarLinks = Array.from(document.querySelectorAll(".sidebar-link[data-screen-nav]"));
+    const blogSidebarItem = document.getElementById("blogSidebarItem");
+    const screens = {
+      home: document.getElementById("screen-home"),
+      blog: document.getElementById("screen-blog")
+    };
+    const articleList = document.getElementById("articleList");
+    const blogListing = document.getElementById("blogListing");
+    const articleView = document.getElementById("articleView");
+    const backToBlogBtn = document.getElementById("backToBlogBtn");
+    const deleteBlogBtn = document.getElementById("deleteBlogBtn");
+    const articleCategory = document.getElementById("articleCategory");
+    const articleTitle = document.getElementById("articleTitle");
+    const articleIntro = document.getElementById("articleIntro");
+    const articleDate = document.getElementById("articleDate");
+    const articleViews = document.getElementById("articleViews");
+    const articleBanner = document.getElementById("articleBanner");
+    const articleContent = document.getElementById("articleContent");
+    const prevArticleBtn = document.getElementById("prevArticleBtn");
+    const nextArticleBtn = document.getElementById("nextArticleBtn");
+    const prevArticleTitle = document.getElementById("prevArticleTitle");
+    const nextArticleTitle = document.getElementById("nextArticleTitle");
+    const tagsBlock = document.getElementById("tagsBlock");
+    let savedRange = null;
+
+    function openModal() {
+      modalBackdrop.classList.add("is-open");
+      modalBackdrop.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeModal() {
+      modalBackdrop.classList.remove("is-open");
+      modalBackdrop.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+    }
+
+    function setScreen(screenName) {
+      tabs.forEach((tab) => {
+        tab.classList.toggle("is-active", tab.dataset.screen === screenName);
+      });
+
+      sidebarLinks.forEach((link) => {
+        link.classList.toggle("is-active", link.dataset.screenNav === screenName);
+      });
+
+      blogSidebarItem.classList.toggle("is-expanded", screenName === "blog");
+
+      Object.entries(screens).forEach(([name, screen]) => {
+        screen.classList.toggle("is-active", name === screenName);
+      });
+    }
+
+    function slugify(value) {
+      return value
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function getCoverStyle(image) {
+      if (image) {
+        return `background-image: linear-gradient(135deg, rgba(18, 63, 149, 0.4), rgba(6, 167, 239, 0.25)), url('${image}')`;
+      }
+      return "";
+    }
+
+    function isAcceptedImageFile(file) {
+      if (!file) return false;
+      const acceptedTypes = ["image/jpeg", "image/png"];
+      const hasAcceptedType = acceptedTypes.includes(file.type);
+      const hasAcceptedExtension = /\.(jpe?g|png)$/i.test(file.name || "");
+      return hasAcceptedType && hasAcceptedExtension;
+    }
+
+    function readImageFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          resolve(typeof reader.result === "string" ? reader.result : "");
+        };
+
+        reader.onerror = () => {
+          reject(new Error("Le fichier image n'a pas pu etre lu."));
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderTags() {
+      tagsBlock.innerHTML = "";
+      articleTags.forEach((tag) => {
+        const span = document.createElement("span");
+        span.className = "tag-pill";
+        span.textContent = tag;
+        tagsBlock.appendChild(span);
+      });
+    }
+
+    function renderArticleList() {
+      articleList.innerHTML = "";
+
+      articles.forEach((article, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "article-row";
+        button.dataset.article = String(index);
+
+        const thumbStyle = getCoverStyle(article.image);
+
+        button.innerHTML = `
+          <div class="article-thumb" style="${thumbStyle}"></div>
+          <div class="article-text">
+            <div class="article-topline">
+              <span class="meta-pill">${article.category}</span>
+              <span>${article.date}</span>
+            </div>
+            <h4>${article.title}</h4>
+            <p>${article.excerpt}</p>
+            <span class="read-link">Poursuivre la lecture</span>
+          </div>
+        `;
+
+        button.addEventListener("click", () => {
+          renderArticle(index);
+        });
+
+        articleList.appendChild(button);
+      });
+    }
+
+    function showListing() {
+      currentArticleIndex = null;
+      articleView.classList.remove("is-active");
+      blogListing.style.display = "block";
+      setScreen("blog");
+    }
+
+    function deleteCurrentArticle() {
+      if (currentArticleIndex === null || !articles[currentArticleIndex]) {
+        return;
+      }
+
+      const articleToDelete = articles[currentArticleIndex];
+      const confirmed = window.confirm(`Supprimer définitivement le blog "${articleToDelete.title}" ?`);
+      if (!confirmed) {
+        return;
+      }
+
+      articles.splice(currentArticleIndex, 1);
+      renderArticleList();
+      showListing();
+    }
+
+    function renderArticle(index) {
+      const article = articles[index];
+      if (!article) {
+        return;
+      }
+
+      currentArticleIndex = index;
+      blogListing.style.display = "none";
+      articleView.classList.add("is-active");
+
+      articleCategory.textContent = article.category;
+      articleTitle.textContent = article.title;
+      articleIntro.textContent = article.excerpt;
+      articleDate.textContent = article.date;
+      articleViews.textContent = `${article.views} vues`;
+      articleBanner.style.cssText = getCoverStyle(article.image);
+      articleContent.innerHTML = buildArticleMarkup(article);
+
+      updateArticleNavigation(index);
+      setScreen("blog");
+    }
+
+    function updateArticleNavigation(index) {
+      const previousIndex = (index - 1 + articles.length) % articles.length;
+      const nextIndex = (index + 1) % articles.length;
+
+      prevArticleTitle.textContent = articles[previousIndex].title;
+      nextArticleTitle.textContent = articles[nextIndex].title;
+
+      prevArticleBtn.onclick = () => renderArticle(previousIndex);
+      nextArticleBtn.onclick = () => renderArticle(nextIndex);
+    }
+
+    function formatDate() {
+      return new Intl.DateTimeFormat("fr-FR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).format(new Date());
+    }
+
+    function buildParagraphs(rawContent) {
+      return rawContent
+        .split(/\n\s*\n/)
+        .map((part) => part.trim())
+        .filter(Boolean);
+    }
+
+    function sanitizeEditorHtml(rawHtml) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<div>${rawHtml}</div>`, "text/html");
+      const root = doc.body.firstElementChild;
+
+      root.querySelectorAll("script,style").forEach((node) => node.remove());
+
+      root.querySelectorAll("*").forEach((node) => {
+        [...node.attributes].forEach((attr) => {
+          if (attr.name.startsWith("on")) {
+            node.removeAttribute(attr.name);
+          }
+        });
+
+        if (node.tagName === "FONT") {
+          const span = doc.createElement("span");
+          span.innerHTML = node.innerHTML;
+          const size = node.getAttribute("size");
+          if (size === "2") span.className = "size-small";
+          if (size === "3") span.className = "size-normal";
+          if (size === "5") span.className = "size-large";
+          if (size === "6" || size === "7") span.className = "size-xlarge";
+          node.replaceWith(span);
+        }
+      });
+
+      root.querySelectorAll("div").forEach((node) => {
+        if (!node.querySelector("div, p, ul, ol, h2, h3, h4")) {
+          const p = doc.createElement("p");
+          p.innerHTML = node.innerHTML || "<br>";
+          node.replaceWith(p);
+        }
+      });
+
+      return root.innerHTML.trim();
+    }
+
+    function buildArticleMarkup(article) {
+      if (article.bodyHtml) {
+        return article.bodyHtml;
+      }
+
+      const fragments = [];
+      article.body.forEach((paragraph, paragraphIndex) => {
+        if (paragraphIndex === 1) {
+          fragments.push("<h4>Pourquoi ce format fonctionne</h4>");
+        }
+        fragments.push(`<p>${paragraph}</p>`);
+      });
+      return fragments.join("");
+    }
+
+    function syncEditorToInput() {
+      blogContentInput.value = sanitizeEditorHtml(blogContentEditor.innerHTML);
+    }
+
+    function focusEditor() {
+      blogContentEditor.focus();
+    }
+
+    function saveSelection() {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) {
+        return;
+      }
+      const range = selection.getRangeAt(0);
+      if (blogContentEditor.contains(range.commonAncestorContainer)) {
+        savedRange = range.cloneRange();
+      }
+    }
+
+    function restoreSelection() {
+      if (!savedRange) {
+        focusEditor();
+        return;
+      }
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(savedRange);
+      focusEditor();
+    }
+
+    function applyEditorCommand(command) {
+      restoreSelection();
+      document.execCommand(command, false);
+      saveSelection();
+      syncEditorToInput();
+    }
+
+    function applyBlockFormat(tagName) {
+      restoreSelection();
+      document.execCommand("formatBlock", false, tagName);
+      saveSelection();
+      syncEditorToInput();
+    }
+
+    function applyFontSize(sizeClass) {
+      restoreSelection();
+      const sizeMap = {
+        "size-small": "2",
+        "size-normal": "3",
+        "size-large": "5",
+        "size-xlarge": "6"
+      };
+      document.execCommand("fontSize", false, sizeMap[sizeClass] || "3");
+      blogContentEditor.innerHTML = sanitizeEditorHtml(blogContentEditor.innerHTML);
+      savedRange = null;
+      sizeButtons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.size === sizeClass);
+      });
+      syncEditorToInput();
+    }
+
+    function applyLink() {
+      restoreSelection();
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+        return;
+      }
+
+      let url = window.prompt("URL du lien :", "https://");
+      if (!url) {
+        return;
+      }
+
+      url = url.trim();
+      if (!/^https?:\/\//i.test(url) && !/^mailto:/i.test(url) && !/^tel:/i.test(url)) {
+        url = `https://${url}`;
+      }
+
+      document.execCommand("createLink", false, url);
+
+      const anchor = selection.anchorNode?.parentElement?.closest("a");
+      if (anchor) {
+        anchor.setAttribute("target", "_blank");
+        anchor.setAttribute("rel", "noopener noreferrer");
+      }
+
+      saveSelection();
+      syncEditorToInput();
+    }
+
+    openModalBtn.addEventListener("click", openModal);
+    closeModalBtn.addEventListener("click", closeModal);
+    cancelModalBtn.addEventListener("click", closeModal);
+
+    modalBackdrop.addEventListener("click", (event) => {
+      if (event.target === modalBackdrop) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeModal();
+      }
+    });
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        if (tab.dataset.screen === "blog") {
+          showListing();
+        }
+        setScreen(tab.dataset.screen);
+      });
+    });
+
+    sidebarLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        if (link.dataset.screenNav === "blog") {
+          showListing();
+        } else {
+          currentArticleIndex = null;
+        }
+        setScreen(link.dataset.screenNav);
+      });
+    });
+
+    openBlogFromHome.addEventListener("click", () => {
+      showListing();
+    });
+
+    backToBlogBtn.addEventListener("click", () => {
+      showListing();
+    });
+
+    deleteBlogBtn.addEventListener("click", () => {
+      deleteCurrentArticle();
+    });
+
+    toolbarButtons.forEach((button) => {
+      button.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+        saveSelection();
+      });
+      button.addEventListener("click", () => {
+        applyEditorCommand(button.dataset.command);
+      });
+    });
+
+    blockButtons.forEach((button) => {
+      button.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+        saveSelection();
+      });
+      button.addEventListener("click", () => {
+        applyBlockFormat(button.dataset.block);
+      });
+    });
+
+    sizeButtons.forEach((button) => {
+      button.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+        saveSelection();
+      });
+      button.addEventListener("click", () => {
+        applyFontSize(button.dataset.size);
+      });
+    });
+
+    linkBtn.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+      saveSelection();
+    });
+
+    linkBtn.addEventListener("click", () => {
+      applyLink();
+    });
+
+    blogContentEditor.addEventListener("mouseup", saveSelection);
+    blogContentEditor.addEventListener("keyup", saveSelection);
+    blogContentEditor.addEventListener("focus", saveSelection);
+
+    blogContentEditor.addEventListener("input", () => {
+      syncEditorToInput();
+    });
+
+    blogContentEditor.addEventListener("wheel", (event) => {
+      event.stopPropagation();
+    }, { passive: true });
+
+    blogContentEditor.addEventListener("blur", () => {
+      blogContentEditor.innerHTML = sanitizeEditorHtml(blogContentEditor.innerHTML);
+      syncEditorToInput();
+    });
+
+    blogImageInput.addEventListener("change", () => {
+      const file = blogImageInput.files && blogImageInput.files[0];
+
+      if (!file) {
+        blogImageInput.setCustomValidity("");
+        return;
+      }
+
+      if (isAcceptedImageFile(file)) {
+        blogImageInput.setCustomValidity("");
+        return;
+      }
+
+      blogImageInput.value = "";
+      blogImageInput.setCustomValidity("Veuillez selectionner une image JPG, JPEG ou PNG.");
+      blogImageInput.reportValidity();
+    });
+
+    blogForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      syncEditorToInput();
+
+      const formData = new FormData(blogForm);
+      const title = String(formData.get("blogTitle") || "").trim();
+      const category = String(formData.get("blogCategory") || "").trim();
+      const excerpt = String(formData.get("blogExcerpt") || "").trim();
+      const content = String(formData.get("blogContent") || "").trim();
+      const imageFile = blogImageInput.files && blogImageInput.files[0];
+
+      if (imageFile && !isAcceptedImageFile(imageFile)) {
+        blogImageInput.setCustomValidity("Veuillez selectionner une image JPG, JPEG ou PNG.");
+        blogImageInput.reportValidity();
+        return;
+      }
+
+      blogImageInput.setCustomValidity("");
+
+      let image = "";
+      if (imageFile) {
+        try {
+          image = await readImageFileAsDataUrl(imageFile);
+        } catch (error) {
+          blogImageInput.setCustomValidity("Le fichier image n'a pas pu etre charge.");
+          blogImageInput.reportValidity();
+          return;
+        }
+      }
+
+      const newArticle = {
+        title,
+        category,
+        date: formatDate(),
+        views: 0,
+        excerpt,
+        image,
+        body: buildParagraphs(blogContentEditor.textContent || ""),
+        bodyHtml: content
+      };
+
+      articles.unshift(newArticle);
+      renderArticleList();
+      renderArticle(0);
+      setScreen("blog");
+
+      saveMessage.textContent = "Le nouveau blog a été créé dans la simulation.";
+      blogForm.reset();
+      blogContentEditor.innerHTML = "";
+      blogContentInput.value = "";
+      savedRange = null;
+      sizeButtons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.size === "size-normal");
+      });
+
+      window.setTimeout(() => {
+        closeModal();
+        saveMessage.textContent = "Le format sera généré automatiquement.";
+      }, 450);
+    });
+
+    renderTags();
+    renderArticleList();
+  </script>
+</body>
+</html>

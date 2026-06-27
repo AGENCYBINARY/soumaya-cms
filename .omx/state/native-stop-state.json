@@ -1,0 +1,14 @@
+{
+  "sessions": {
+    "019f086c-8dd9-7d11-96f7-15d566e14758": {
+      "ordinary_no_progress_guard": {
+        "fingerprint": "ordinary|oui. le plus simple, c’est : 1. mettre le dossier en git local. ```bash cd \"/users/maximeneveu/desktop/test cms\" git init git add . git commit -m \"initial commit\" ``` 2. créer un repo github vide, puis le connecter. si tu utilises github cli : ```bash gh repo create nom-du-repo --private --source=. --remote=origin --push ``` sinon, après avoir créé le repo sur github : ```bash git branch -m main git remote add origin https://github.com/ton-user/ton-repo.git git push -u origin main ``` 3. importer le repo dans vercel. va sur [vercel new project](https://vercel.com/new), connecte github, sélectionne le repo, puis clique sur deploy. vercel redéploie automatiquement à chaque `git push` sur le repo. sources: [vercel deployments](https://vercel.com/docs/deployments), [vercel git](https://vercel.com/docs/git), [github local repo → github](https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github). si tu veux, je peux aussi te faire directement l’initialisation git dans le dossier maintenant.",
+        "first_seen_at": "2026-06-27T12:37:31.247Z",
+        "last_seen_at": "2026-06-27T12:37:31.247Z",
+        "repeat_count": 1,
+        "last_turn_id": "019f0915-0749-7181-ac9a-af932097faa2",
+        "last_thread_id": null
+      }
+    }
+  }
+}
